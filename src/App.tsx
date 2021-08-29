@@ -1,25 +1,44 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect } from 'react';
+
+import { SHORTCUT } from './constants';
+
+import { Toast } from './components';
+
+import { WorkspaceStateProvider } from './contexts/workspace';
+
+import { Menu, SideBar } from './modules/application';
+import { NoteCard, IconCard } from './modules/cards';
+import { CanvasContainer } from './modules/canvas';
+
+import { Shortcut } from './libraries/shortcut';
 
 function App() {
+  const shortcut = new Shortcut();
+  shortcut.setShortcut([SHORTCUT.PREFIX_CODE.SHIFT, 'S'], () => {
+    Toast.info({
+      message: 'SHIFT + S'
+    });
+  });
+
+  useEffect(() => {
+    shortcut.initial();
+
+    return () => {
+      shortcut.destroy();
+    }
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <React.Fragment>
+      <WorkspaceStateProvider>
+        <SideBar />
+        <Menu />
+        <CanvasContainer>
+          <NoteCard />
+          <IconCard />
+        </CanvasContainer>
+      </WorkspaceStateProvider>
+    </React.Fragment>
   );
 }
 
